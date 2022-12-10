@@ -40,7 +40,7 @@ TALLEST_L = 0
 TALLEST_R = 1
 TALLEST_U = 2
 TALLEST_D = 3
-class TallestPerDirectionTable():
+class TallestPerDirectionTable:
     def __init__(self, height_grid: List[List[int]]):
         self._height_grid = height_grid
         self._initialize_table()
