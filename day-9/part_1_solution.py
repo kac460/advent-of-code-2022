@@ -60,16 +60,4 @@ if __name__ == '__main__':
     for move in get_moves():
         mover.move_h(move)
     print(len(mover.t_visited))
-    '''mover.move_h(Move(UP, 1))
-    print('move up 1')
-    mover.move_h(Move(UP, 1))
-    print('move up 1')
-    mover.move_h(Move(DOWN, 1))
-    print('move down 1')
-    mover.move_h(Move(UP, 1))
-    print('move up 1')
-    mover.move_h(Move(RIGHT, 1))
-    print('move right 1')
-    mover.move_h(Move(RIGHT, 1))
-    print('move right 1')'''
     
