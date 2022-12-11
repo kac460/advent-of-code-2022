@@ -54,30 +54,10 @@ class RopeMover:
 
     # just match on the closer axis
     # and move within 1 on the less close axis
-    
-    # we could've tried to be intelligent about which directions actually need to be checked
-    # based on how _h moved, but this is easier and still asymptotically the same runtime
-    def _move_t_if_needed(self) -> None:
-        # need to move 1 closer x-wise, match y-wise
-        print(f't={self._t}, h={self._h}')
-        if abs(self._t.x - self._h.x) >= MOVE_THRESHOLD:
-            # e.g., if t.x=3, h.x=1, add (h.x - h.y)=(1 - 3)= -2
-            print('moving hor, matching ver')
-            displacement = -1 * MOVE_DIST if self._t.x > self._h.x else MOVE_DIST
-            self._t.x += displacement
-            self._t.y = self._h.y
-        else:
-            print('matching hor, moving ver')
-            displacement = -1 * MOVE_DIST if self._t.y > self._h.y else MOVE_DIST
-            self._t.x = self._h.x
-            self._t.y += displacement
-        print(f'now: t={self._t}, h={self._h}')
-        self.t_visited.add(self._t)
 
 if __name__ == '__main__':
     mover = RopeMover()
     for move in get_moves():
-        print(f'move: {move}')
         mover.move_h(move)
     print(len(mover.t_visited))
     '''mover.move_h(Move(UP, 1))
