@@ -1,7 +1,7 @@
 from __future__ import annotations
 import re
 from collections import deque
-from math import floor, prod
+from math import prod
 
 class WhomstToThrowTo:
     def __init__(self, divisor: int, true_friend: int, false_friend: int):
@@ -14,9 +14,10 @@ class WhomstToThrowTo:
 
 _OLD = 'old'
 class WorryOperation:
-    def __init__(self, operator: str, operand: str):
+    def __init__(self, operator: str, operand: str, worry_reduction: int):
         self.operator = operator
         self.operand = operand
+        self.worry_reduction = worry_reduction
     
     def __call__(self, item: int) -> int:
         if self.operand == _OLD:
@@ -29,7 +30,9 @@ class WorryOperation:
             new_worry = item + operand
         else:
             raise ValueError(f'unsupported operand {self.operand}')
-        return floor(new_worry /3)
+        if self.worry_reduction != 1:
+            return new_worry // self.worry_reduction
+        return new_worry
 
 class Monkey:
     def __init__(
@@ -57,8 +60,6 @@ class Monkey:
         while len(self._items) > 0:
             self.num_inspections += 1
             item = self._items.popleft()
-            if item == 79:
-                print('here')
             #print('Monkey 0:')
             #print(f'Inspecting {item}. inspection #{self.num_inspections}')
             item = self._worry_operation(item)
@@ -77,7 +78,7 @@ class Monkey:
         )
 
 
-def get_monkeys() -> dict[int, Monkey]:
+def get_monkeys(worry_reduction: int = 3) -> dict[int, Monkey]:
     monkey_buddies = {}
     with open('day-11/input.txt') as f:
         lines = f.readlines()
@@ -96,7 +97,7 @@ def get_monkeys() -> dict[int, Monkey]:
             elif line_split[0] == 'Operation:':
                 operator = line_split[4]
                 operand = line_split[5]
-                operation = WorryOperation(operator, operand)
+                operation = WorryOperation(operator, operand, worry_reduction)
             elif line_split[0] == 'Test:': 
                 divisor = int(line_split[3])
             elif line_split[0] == 'If' and line_split[1] == 'true:':
