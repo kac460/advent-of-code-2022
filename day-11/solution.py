@@ -14,10 +14,10 @@ class WhomstToThrowTo:
 
 _OLD = 'old'
 class WorryOperation:
-    def __init__(self, operator: str, operand: str, worry_reduction: int):
+    def __init__(self, operator: str, operand: str, magical_mod: int = None):
         self.operator = operator
         self.operand = operand
-        self.worry_reduction = worry_reduction
+        self.magical_mod = magical_mod
     
     def __call__(self, item: int) -> int:
         if self.operand == _OLD:
@@ -30,9 +30,9 @@ class WorryOperation:
             new_worry = item + operand
         else:
             raise ValueError(f'unsupported operand {self.operand}')
-        if self.worry_reduction != 1:
-            return new_worry // self.worry_reduction
-        return new_worry
+        if self.magical_mod is None:
+            return new_worry // 3
+        return new_worry % self.magical_mod
 
 class Monkey:
     def __init__(
@@ -47,7 +47,7 @@ class Monkey:
         self._id = id
         self._friends = friends
         self._worry_operation = worry_operation
-        self._whomst_to_throw_to = whomst_to_throw_to
+        self.whomst_to_throw_to = whomst_to_throw_to
         self._items = deque()
         for item in starting_items:
             self._items.append(item)
@@ -63,7 +63,7 @@ class Monkey:
             #print('Monkey 0:')
             #print(f'Inspecting {item}. inspection #{self.num_inspections}')
             item = self._worry_operation(item)
-            to_monkey = self._friends[self._whomst_to_throw_to(item)]
+            to_monkey = self._friends[self.whomst_to_throw_to(item)]
             #print(f'Monkey {self._id} throwing {item} to {to_monkey._id}')
             to_monkey.catch(item)
 
@@ -72,13 +72,13 @@ class Monkey:
             f'Monkey {self._id}:\n'
             f'  Items: {", ".join([str(item) for item in self._items])}\n'
             f'  Operation: new = old {self._worry_operation.operator} {self._worry_operation.operand}\n'
-            f'  Test: divisble by {self._whomst_to_throw_to.divisor}\n'
-            f'  If true: throw to monkey {self._whomst_to_throw_to.true_friend}\n'
-            f'  If false: throw to monkey {self._whomst_to_throw_to.false_friend}\n'
+            f'  Test: divisble by {self.whomst_to_throw_to.divisor}\n'
+            f'  If true: throw to monkey {self.whomst_to_throw_to.true_friend}\n'
+            f'  If false: throw to monkey {self.whomst_to_throw_to.false_friend}\n'
         )
 
 
-def get_monkeys(worry_reduction: int = 3) -> dict[int, Monkey]:
+def get_monkeys(magical_mod: int = None) -> dict[int, Monkey]:
     monkey_buddies = {}
     with open('day-11/input.txt') as f:
         lines = f.readlines()
@@ -97,7 +97,7 @@ def get_monkeys(worry_reduction: int = 3) -> dict[int, Monkey]:
             elif line_split[0] == 'Operation:':
                 operator = line_split[4]
                 operand = line_split[5]
-                operation = WorryOperation(operator, operand, worry_reduction)
+                operation = WorryOperation(operator, operand, magical_mod)
             elif line_split[0] == 'Test:': 
                 divisor = int(line_split[3])
             elif line_split[0] == 'If' and line_split[1] == 'true:':
@@ -127,18 +127,30 @@ def monkey_business(monkey_buds: dict[int, Monkey]) -> int:
         )[:2]
     )
 
-_NUM_ROUNDS = 20
+def get_magical_mod(monkey_pals: dict[int, Monkey]) -> int:
+    magical_mod = 1
+    for monkey in monkey_pals.values():
+        magical_mod *= monkey.whomst_to_throw_to.divisor
+    return magical_mod
+
+def play(monkey_pals: dict[int, Monkey], num_rounds: int):
+    for _ in range(num_rounds):
+        for i in range(len(monkey_pals)):
+            monkey_pals[i].throw()
+
+_NUM_ROUNDS_1 = 20
+_NUM_ROUNDS_2 = 10000
 if __name__ == '__main__':
+    print('PART 1')
     monkey_pals = get_monkeys()
     '''for monkey in monkey_pals.values():
         print(monkey)'''
-    for round in range(_NUM_ROUNDS):
-        for i in range(len(monkey_pals)):
-            monkey_pals[i].throw()
-        print(f'After round {round+1}, the monkeys are holding items with these worry levels: ')
-        for i in range(len(monkey_pals)):
-            print(f'Monkey {i}: {", ".join([str(item) for item in monkey_pals[i]._items])}')
-        print('')
+    play(monkey_pals, _NUM_ROUNDS_1)
     print(monkey_business(monkey_pals))
-
+    print('----')
+    print('PART 2')
+    magical_mod = get_magical_mod(monkey_pals)
+    monkey_pals = get_monkeys(magical_mod)
+    play(monkey_pals, _NUM_ROUNDS_2)
+    print(monkey_business(monkey_pals))
     
