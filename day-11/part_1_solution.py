@@ -5,30 +5,30 @@ from math import floor, prod
 
 class WhomstToThrowTo:
     def __init__(self, divisor: int, true_friend: int, false_friend: int):
-        self._divisor = divisor
-        self._true_friend = true_friend
-        self._false_friend = false_friend
+        self.divisor = divisor
+        self.true_friend = true_friend
+        self.false_friend = false_friend
 
     def __call__(self, item: int) -> int:
-        return self._true_friend if item % self._divisor == 0 else self._false_friend
+        return self.true_friend if item % self.divisor == 0 else self.false_friend
 
 _OLD = 'old'
 class WorryOperation:
     def __init__(self, operator: str, operand: str):
-        self._operator = operator
-        self._operand = operand
+        self.operator = operator
+        self.operand = operand
     
     def __call__(self, item: int) -> int:
-        if self._operand == _OLD:
+        if self.operand == _OLD:
             operand = item
         else:
-            operand = int(self._operand)
-        if self._operator == '*':
+            operand = int(self.operand)
+        if self.operator == '*':
             new_worry = item * operand
-        elif self._operator == '+':
+        elif self.operator == '+':
             new_worry = item + operand
         else:
-            raise ValueError(f'unsupported operand {self._operand}')
+            raise ValueError(f'unsupported operand {self.operand}')
         return floor(new_worry /3)
 
 class Monkey:
@@ -70,10 +70,10 @@ class Monkey:
         return (
             f'Monkey {self._id}:\n'
             f'  Items: {", ".join([str(item) for item in self._items])}\n'
-            f'  Operation: new = old {self._worry_operation._operator} {self._worry_operation._operand}\n'
-            f'  Test: divisble by {self._whomst_to_throw_to._divisor}\n'
-            f'  If true: throw to monkey {self._whomst_to_throw_to._true_friend}\n'
-            f'  If false: throw to monkey {self._whomst_to_throw_to._false_friend}\n'
+            f'  Operation: new = old {self._worry_operation.operator} {self._worry_operation.operand}\n'
+            f'  Test: divisble by {self._whomst_to_throw_to.divisor}\n'
+            f'  If true: throw to monkey {self._whomst_to_throw_to.true_friend}\n'
+            f'  If false: throw to monkey {self._whomst_to_throw_to.false_friend}\n'
         )
 
 
