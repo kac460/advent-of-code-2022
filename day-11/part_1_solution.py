@@ -1,6 +1,6 @@
 from __future__ import annotations
 import re
-from queue import Queue
+from collections import deque
 from math import floor, prod
 
 class WhomstToThrowTo:
@@ -36,7 +36,7 @@ class Monkey:
         self, 
         id: int,
         friends: dict[int, Monkey], 
-        starting_items: list[int],
+        starting_items: deque[int],
         worry_operation: WorryOperation,
         whomst_to_throw_to: WhomstToThrowTo,
     ):
@@ -45,23 +45,36 @@ class Monkey:
         self._friends = friends
         self._worry_operation = worry_operation
         self._whomst_to_throw_to = whomst_to_throw_to
-        self._items = Queue()
+        self._items = deque()
         for item in starting_items:
-            self._items.put(item)
+            self._items.append(item)
         self.num_inspections = 0
 
     def catch(self, item: int) -> None:
-        self._items.put(item)
+        self._items.append(item)
     
     def throw(self) -> None:
-        while not self._items.empty():
+        while len(self._items) > 0:
             self.num_inspections += 1
-            item = self._items.get_nowait()
-            #print(f'Monkey {self._id} inspecting {item}. inspection #{self.num_inspections}')
-            to_monkey = self._friends[self._whomst_to_throw_to(item)]
+            item = self._items.popleft()
+            if item == 79:
+                print('here')
+            #print('Monkey 0:')
+            #print(f'Inspecting {item}. inspection #{self.num_inspections}')
             item = self._worry_operation(item)
+            to_monkey = self._friends[self._whomst_to_throw_to(item)]
             #print(f'Monkey {self._id} throwing {item} to {to_monkey._id}')
             to_monkey.catch(item)
+
+    def __str__(self) -> str:
+        return (
+            f'Monkey {self._id}:\n'
+            f'  Items: {", ".join([str(item) for item in self._items])}\n'
+            f'  Operation: new = old {self._worry_operation._operator} {self._worry_operation._operand}\n'
+            f'  Test: divisble by {self._whomst_to_throw_to._divisor}\n'
+            f'  If true: throw to monkey {self._whomst_to_throw_to._true_friend}\n'
+            f'  If false: throw to monkey {self._whomst_to_throw_to._false_friend}\n'
+        )
 
 
 def get_monkeys() -> dict[int, Monkey]:
@@ -116,9 +129,15 @@ def monkey_business(monkey_buds: dict[int, Monkey]) -> int:
 _NUM_ROUNDS = 20
 if __name__ == '__main__':
     monkey_pals = get_monkeys()
+    '''for monkey in monkey_pals.values():
+        print(monkey)'''
     for round in range(_NUM_ROUNDS):
         for i in range(len(monkey_pals)):
             monkey_pals[i].throw()
+        print(f'After round {round+1}, the monkeys are holding items with these worry levels: ')
+        for i in range(len(monkey_pals)):
+            print(f'Monkey {i}: {", ".join([str(item) for item in monkey_pals[i]._items])}')
+        print('')
     print(monkey_business(monkey_pals))
 
     
