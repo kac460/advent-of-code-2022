@@ -1,5 +1,6 @@
 from __future__ import annotations
-from collections import deque, namedtuple
+from collections import deque
+from typing import Any
 
 _FILENAME = 'day-12/input.txt'
 def read_input() -> list[str]:
@@ -31,7 +32,6 @@ def get_graph() -> dict[tuple[int, int], set[int]]:
             }
     return graph
 
-StartEnd = namedtuple('StartEnd', 's e')
 def get_s_e() -> StartEnd:
     lines = read_input()
     s = e = None
@@ -40,15 +40,15 @@ def get_s_e() -> StartEnd:
             if lines[i][j] == 'S':
                 s = (i, j)
                 if e:
-                    return StartEnd(s, e)
+                    return s, e
             elif lines[i][j] == 'E':
                 e = (i, j)
                 if s:
-                    return StartEnd(s, e)
+                    return s, e
                 
 
 
-def bfs(graph: dict[any, set[int]], s: tuple[int,int], e: tuple[int,int]) -> list[tuple[int, int]]:
+def bfs(graph: dict[Any, set[int]], s: tuple[int,int], e: tuple[int,int]) -> list[tuple[int, int]]:
     q = deque()
     parents = {}
     parents[s] = None 
