@@ -32,7 +32,7 @@ def get_graph() -> dict[tuple[int, int], set[int]]:
             }
     return graph
 
-def get_s_e() -> StartEnd:
+def get_s_e() -> tuple[int, int]:
     lines = read_input()
     s = e = None
     for i in range(len(lines)):
