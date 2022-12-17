@@ -54,7 +54,6 @@ def get_invalid_ranges(
 ) -> set[tuple[int, int]]:
     invalid_positions = set()
     for sensor, md in sensor_max_distances.items():
-        print(f'sensor={sensor}, md={md}')
         y_dist = abs(sensor.y - y)
         md_minus_y_dist = md - y_dist
         if md_minus_y_dist >= 0:
@@ -92,7 +91,15 @@ def get_num_invalid_positions(
     return sum(r[_MAX] - r[_MIN] for r in non_ovelapping) + 1 - num_beacons_in_range
         
 
-
+def find_beacon(sensor_max_distances: dict[Position, int], max_pos: int) -> Position:
+    for y in range(0, max_pos + 1):
+        ranges = get_invalid_ranges(sensor_max_distances, y)
+        non_overlapping = merge_ranges(ranges)
+        if len(non_overlapping) > 1:
+            non_overlapping = sorted(non_overlapping)
+            x =  non_overlapping[0][_MAX] + 1
+            return Position(x, y)
+    raise Exception('beacon not located')
 
 
 
@@ -108,18 +115,31 @@ def get_num_invalid_positions(
         positions_to_check.difference_update(new_invalid_positions)
     return invalid_positions'''
 
-_PART_1_Y = 2000000
-_FILE = 'day-15/input.txt'
+_TEST = False
 if __name__ == '__main__':
-    _sensors = get_sensors(_FILE)
+    if _TEST:
+        _y = 11
+        _file = 'day-15/test.txt'
+        _max_pos = 20
+    else:
+        _y = 2000000
+        _file = 'day-15/input.txt'
+        _max_pos = 4000000
+    _sensors = get_sensors(_file)
     _beacons = {beacon for beacon in _sensors.values()}
     _sensor_max_distances = get_sensor_max_distances(_sensors)
     _invalid_ranges = get_invalid_ranges(
         _sensor_max_distances,
-        _PART_1_Y
+        _y
     )
-    num_invalid_positions = get_num_invalid_positions(_invalid_ranges, _PART_1_Y, _beacons)
-    print(num_invalid_positions)
+    _num_invalid_positions = get_num_invalid_positions(_invalid_ranges, _y, _beacons)
+    print('PART 1')
+    print(_num_invalid_positions)
+    print('---')
+    print('PART 2')
+    _beacon = find_beacon(_sensor_max_distances, _max_pos)
+    print(_beacon)
+    print(4000000*_beacon.x + _beacon.y)
 
 
 # For any x, y
