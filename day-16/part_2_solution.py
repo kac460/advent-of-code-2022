@@ -48,6 +48,7 @@ def most_pressure_to_release(
                         e_release = None
                         e_best = max(e_skip, e_release)
                     memo[(m, e, t, open_valves)] = m_best + e_best
+  return memo[(s, s, start_time, frozenset({}))]
                     
 
 
